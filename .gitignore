@@ -1,0 +1,6 @@
+.state/
+.env
+workspaces/
+node_modules/
+relay/relaycast.db*
+actor/.durable-actors/

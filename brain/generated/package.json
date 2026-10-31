@@ -1,0 +1,8 @@
+{
+  "private": true,
+  "type": "module",
+  "peerDependencies": {
+    "json-schema": "7.0.15",
+    "zod": "4.6.7"
+  }
+}

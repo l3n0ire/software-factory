@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Software Factory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #1d1526; --panel: #2a1f36; --panel2: #33264a; --ink: #f6eefc; --muted: #b9a8cc;
+    --orange: #ff8a3d; --green: #5fd38d; --red: #ff5d73; --blue: #6cc4ff; --purple: #b78cff; --yellow: #ffd166;
+    --line: #47365f;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: Fredoka, system-ui, sans-serif; }
+  header { display: flex; align-items: center; gap: 14px; padding: 12px 18px; border-bottom: 2px solid var(--line); flex-wrap: wrap; }
+  header h1 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: .3px; }
+  header h1 span { color: var(--orange); }
+  .tag { font-size: 12px; padding: 3px 9px; border-radius: 99px; background: var(--panel2); color: var(--muted); }
+  .tag.live { background: #1f4d36; color: #b8f5cf; }
+  .tag.dead { background: #5a1f2b; color: #ffc2cc; }
+  .tag.mock { background: #5a4214; color: #ffe2a3; }
+  main { display: grid; grid-template-columns: minmax(0, 1fr) 420px; gap: 14px; padding: 14px; }
+  @media (max-width: 1100px) { main { grid-template-columns: 1fr; } }
+  .card { background: var(--panel); border: 2px solid var(--line); border-radius: 16px; padding: 12px 14px; }
+  .card h2 { margin: 0 0 8px; font-size: 15px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+  #officeWrap { position: relative; }
+  canvas { width: 100%; height: auto; display: block; border-radius: 14px; background: #3b2b44; }
+  .left { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+  .right { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+  form { display: flex; flex-direction: column; gap: 8px; }
+  input, textarea { background: var(--bg); color: var(--ink); border: 2px solid var(--line); border-radius: 10px; padding: 8px 10px; font: inherit; font-size: 14px; }
+  textarea { min-height: 60px; resize: vertical; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; }
+  button { font: inherit; font-weight: 600; border: 0; border-radius: 10px; padding: 8px 14px; cursor: pointer; background: var(--orange); color: #2a1406; }
+  button.secondary { background: var(--panel2); color: var(--ink); }
+  button:disabled { opacity: .5; cursor: default; }
+  .tickets { display: flex; flex-direction: column; gap: 6px; max-height: 150px; overflow: auto; }
+  .tk { display: flex; justify-content: space-between; gap: 8px; align-items: center; padding: 6px 8px; border-radius: 10px; background: var(--panel2); cursor: pointer; font-size: 14px; }
+  .tk.sel { outline: 2px solid var(--orange); }
+  .pill { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 99px; text-transform: uppercase; white-space: nowrap; }
+  .s-done { background: var(--green); color: #0b2a18; } .s-failed { background: var(--red); color: #2c0610; }
+  .s-queued { background: #6b5a80; } .s-speccing { background: var(--purple); color: #1d0f33; }
+  .s-implementing, .s-fixing { background: var(--blue); color: #08263a; } .s-reviewing { background: var(--yellow); color: #3a2a00; }
+  .s-verifying { background: #9fe3c0; color: #0b2a18; }
+  .steps { display: flex; gap: 4px; margin: 6px 0 10px; }
+  .step { flex: 1; height: 8px; border-radius: 99px; background: var(--panel2); }
+  .step.on { background: var(--orange); } .step.ok { background: var(--green); } .step.bad { background: var(--red); }
+  .kv { font-size: 13px; color: var(--muted); display: grid; grid-template-columns: 90px 1fr; gap: 3px 8px; }
+  .kv b { color: var(--ink); font-weight: 500; word-break: break-all; }
+  pre { margin: 0; white-space: pre-wrap; word-break: break-word; font-family: "JetBrains Mono", monospace; font-size: 12px; }
+  .spec { background: var(--bg); border-radius: 10px; padding: 8px; max-height: 140px; overflow: auto; margin-top: 8px; }
+  #detail a { color: var(--yellow); }
+  #profile summary { cursor: pointer; margin-top: 10px; color: var(--purple); font-weight: 600; }
+  .memlist { margin: 6px 0 0; padding-left: 18px; font-size: 13px; }
+  .promptbox { background: #150f1c; border-radius: 10px; padding: 8px; max-height: 220px; overflow: auto; white-space: pre-wrap; font-size: 12px; }
+  #detail summary { cursor: pointer; margin-top: 10px; color: var(--purple); font-weight: 600; }
+  .diff { background: #150f1c; border-radius: 10px; padding: 8px; max-height: 320px; overflow: auto; }
+  .diff .a { color: #8ff0b3; } .diff .d { color: #ff9aa9; } .diff .h { color: var(--purple); } .diff .f { color: var(--yellow); font-weight: 600; }
+  .log { max-height: 300px; overflow: auto; display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
+  .ev { padding: 5px 8px; border-radius: 8px; background: var(--panel2); }
+  .ev.relay { border-left: 4px solid var(--orange); }
+  .ev.result { border-left: 4px solid var(--green); }
+  .ev.tool { opacity: .8; font-size: 12px; }
+  .ev .meta { color: var(--muted); font-size: 11px; }
+  .fail { color: #ffc2cc; background: #4a1a26; padding: 8px; border-radius: 10px; margin-top: 8px; font-size: 13px; white-space: pre-wrap; }
+  .reviews div { font-size: 13px; margin-top: 4px; }
+  .empty { color: var(--muted); font-size: 13px; }
+  .tabs { display: flex; gap: 6px; margin-bottom: 8px; }
+  .tabs button { padding: 4px 10px; font-size: 13px; }
+  .agents { display: flex; flex-direction: column; gap: 6px; max-height: 300px; overflow: auto; }
+  .agent { background: var(--panel2); border-radius: 10px; padding: 7px 9px; font-size: 14px; }
+  .agent.sel { outline: 2px solid var(--orange); }
+  .agent.retired { opacity: .55; font-size: 13px; }
+  .agent form { margin-top: 6px; }
+  .muted { color: var(--muted); font-size: 12px; }
+  button.small { padding: 3px 9px; font-size: 12px; }
+  select { background: var(--bg); color: var(--ink); border: 2px solid var(--line); border-radius: 10px; padding: 7px; font: inherit; font-size: 14px; }
+  .role-pm { background: var(--purple); color: #1d0f33; } .role-engineer { background: var(--blue); color: #08263a; } .role-reviewer { background: var(--yellow); color: #3a2a00; }
+  canvas { cursor: pointer; }
+  details.card > summary { cursor: pointer; font-size: 15px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; list-style: none; }
+  details.card > summary::after { content: " ▾"; } details.card:not([open]) > summary::after { content: " ▸"; }
+  .chips { display: flex; flex-wrap: wrap; gap: 5px; margin: 8px 0; }
+  .chip { background: var(--panel2); color: var(--ink); padding: 3px 10px; font-size: 12px; font-weight: 500; border: 2px solid transparent; }
+  .chip.on { border-color: var(--c, var(--orange)); background: var(--bg); }
+  .thread { max-height: 220px; overflow: auto; display: flex; flex-direction: column; gap: 5px; font-size: 13px; margin-bottom: 8px; }
+  .msg { background: var(--panel2); padding: 5px 9px; border-radius: 10px; max-width: 92%; }
+  .msg.me { align-self: flex-end; background: #5a3a1f; }
+</style>
+</head>
+<body>
+<header>
+  <h1>👻 Software <span>Factory</span></h1>
+  <span class="tag" id="conn">connecting…</span>
+  <span class="tag" id="mode">…</span>
+  <span class="tag" id="boot">boot #?</span>
+  <span class="tag">Terse actors + Agent Relay</span>
+</header>
+<main>
+  <section class="left">
+    <div class="card" id="officeWrap"><canvas id="office" width="1000" height="600"></canvas></div>
+    <details class="card" id="chatCard">
+      <summary id="chatSummary">Chat with the team</summary>
+      <div class="chips" id="chatChips"></div>
+      <div class="thread" id="chatThread"></div>
+      <form id="chatForm" class="row" style="flex-direction:row">
+        <input id="chatText" maxlength="1000" placeholder="Message (say “remember …” to save a note)" style="flex:1;min-width:0" />
+        <button id="chatSend" type="submit">Send</button>
+      </form>
+    </details>
+    <div class="card">
+      <h2>Team <span class="tag" id="rosterCount" style="float:right;text-transform:none;letter-spacing:0"></span></h2>
+      <div class="agents" id="roster"><div class="empty">Loading roster…</div></div>
+      <form id="hireForm" style="margin-top:10px">
+        <div class="row">
+          <input name="name" placeholder="New hire's name" maxlength="24" required style="flex:1;min-width:120px" />
+          <select name="role"><option value="engineer">engineer</option><option value="reviewer">reviewer</option><option value="pm">pm</option></select>
+        </div>
+        <input name="persona" placeholder="Persona (optional), e.g. terse, test-obsessed" maxlength="200" />
+        <button type="submit">Hire</button>
+      </form>
+    </div>
+    <div class="card" id="profileCard" style="display:none">
+      <h2>Agent profile <button class="secondary small" id="profileClose" style="float:right">Close</button></h2>
+      <div id="profile"></div>
+    </div>
+    <div class="card">
+      <h2>Event log (Company actor, newest first)</h2>
+      <div class="log" id="log"><div class="empty">No events yet.</div></div>
+    </div>
+  </section>
+  <section class="right">
+    <div class="card">
+      <h2>File a ticket</h2>
+      <form id="form">
+        <input id="title" placeholder="Title, e.g. Add a GET /health endpoint" maxlength="120" />
+        <textarea id="desc" placeholder="What should the team build?"></textarea>
+        <div class="row">
+          <button type="submit" id="fileBtn">File ticket</button>
+          <button type="button" class="secondary" id="demoBtn">🎃 Demo ticket</button>
+        </div>
+      </form>
+    </div>
+    <div class="card">
+      <h2>Tickets</h2>
+      <div class="tickets" id="tickets"><div class="empty">No tickets yet.</div></div>
+    </div>
+    <div class="card" id="detail"><h2>Ticket</h2><div class="empty">Select a ticket.</div></div>
+    <div class="card">
+      <div class="tabs"><button class="secondary" id="diffTab">Diff</button><button class="secondary" id="testTab">Test output</button></div>
+      <div class="diff" id="diff"><div class="empty">The diff appears once the engineer commits.</div></div>
+    </div>
+  </section>
+</main>
+<script type="module" src="app.js"></script>
+</body>
+</html>

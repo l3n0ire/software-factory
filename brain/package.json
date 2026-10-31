@@ -1,0 +1,22 @@
+{
+  "name": "brain",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "bun src/main.ts",
+    "demo": "bun src/demo.ts",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^7"
+  },
+  "dependencies": {
+    "@agent-relay/sdk": "15.0.1",
+    "terse-sdk": "0.9.19",
+    "zod": "^4.6.7"
+  }
+}
