@@ -181,6 +181,21 @@ async function serve() {
     console.log(`Office UI: http://localhost:${config.port}`)
 }
 
+// Token cap warnings: one event-log line at 90% and one at 100%, re-armed once the counter drops (reset).
+let tokenWarned: 0 | 90 | 100 = 0
+setInterval(async () => {
+    const { used, cap } = tokenUsage()
+    const level = used >= cap ? 100 : used >= cap * 0.9 ? 90 : 0
+    if (level < tokenWarned) tokenWarned = level as 0 | 90 | 100
+    if (level > tokenWarned) {
+        tokenWarned = level as 0 | 90 | 100
+        const text = level === 100
+            ? `Token cap reached (${used.toLocaleString()} / ${cap.toLocaleString()}). Running tickets will pause at their next LLM call; click "Reset tokens" in the header to continue.`
+            : `Token usage is at 90% of the cap (${used.toLocaleString()} / ${cap.toLocaleString()}). Click "Reset tokens" in the header, or raise MAX_TOTAL_TOKENS.`
+        await company.log({ ticketId: null, kind: "system", from: "factory", to: null, text }).catch(() => {})
+    }
+}, 3000)
+
 await boot()
 await serve()
 await resumeUnfinished()

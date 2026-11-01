@@ -372,12 +372,12 @@ function renderDetail(t) {
       <span>Time</span><b>${t.finishedAt ? `${Math.round((t.finishedAt - t.createdAt) / 1000)}s` : `${left}s left`}</b>
       <span>LLM calls</span><b>${t.llmCalls} / ${t.limits.maxLlmCalls}${cfg.mock ? " (mock)" : ""}</b>
     </div>
-    ${t.state === "failed" ? `<div class="fail"><b>Failed while ${esc(t.failedStage || "?")}</b>: ${esc(t.failureReason)}
+    ${t.state === "failed" ? `<div class="fail"><b>${/token ceiling/i.test(t.failureReason) ? "Paused" : "Failed"} while ${esc(t.failedStage || "?")}</b>: ${esc(t.failureReason)}
       <div class="row" style="margin-top:8px;align-items:center">
-        ${(t.retries ?? 0) < (t.maxRetries ?? 3) ? `<button class="small" onclick="retryTicket('${t.ticketId}','resume', this)">Retry from ${esc(t.failedStage || "start")}</button>
+        ${(t.retries ?? 0) < (t.maxRetries ?? 3) ? `${/token ceiling/i.test(t.failureReason) ? `<button class="small" onclick="resetTokens().then(() => retryTicket('${t.ticketId}','resume', this))">Reset tokens &amp; resume</button>` : `<button class="small" onclick="retryTicket('${t.ticketId}','resume', this)">Retry from ${esc(t.failedStage || "start")}</button>`}
         <button class="secondary small" onclick="retryTicket('${t.ticketId}','scratch', this)">Retry from scratch</button>` : `<span>No retries left.</span>`}
         <span class="muted">retries ${t.retries ?? 0}/${t.maxRetries ?? 3}</span>
-        ${/token ceiling/i.test(t.failureReason) ? `<a href="#" onclick="post('/api/tokens',{}).then(()=>alert('Token counter reset. Now click Retry.'));return false">Reset tokens</a>` : ""}
+        ${/token ceiling/i.test(t.failureReason) ? `<a href="#" onclick="resetTokens();return false">Reset tokens</a>` : ""}
       </div></div>` : t.retries ? `<div class="muted">retries ${t.retries}/${t.maxRetries ?? 3}</div>` : ""}
     ${t.state === "done" ? tryBlock(t) : ""}
     <details id="moreDetails" ${detailsOpen ? "open" : ""}>
@@ -615,3 +615,21 @@ window.retryTicket = async (id, mode, btn) => {
   const r = await post(`/api/tickets/${id}/retry`, { mode })
   if (r.error) { alert(r.error); btn.closest(".row").querySelectorAll("button").forEach(b => b.disabled = false) }
 }
+
+
+// ---------------------------------------------------------------- token counter (header chip + reset)
+
+async function refreshTokens() {
+  const t = await fetch("/api/tokens").then(r => r.json()).catch(() => null)
+  if (!t) return
+  const el = $("#tokens")
+  el.textContent = `tokens ${Math.round(t.used / 1000)}k / ${Math.round(t.cap / 1000)}k · reset`
+  el.style.color = t.used >= t.cap * 0.9 ? "#ff9aa9" : ""
+}
+window.resetTokens = async () => {
+  await fetch("/api/tokens", { method: "POST" })
+  await refreshTokens()
+}
+$("#tokens").onclick = window.resetTokens
+refreshTokens()
+setInterval(refreshTokens, 4000)

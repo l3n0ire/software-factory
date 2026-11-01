@@ -1,4 +1,4 @@
-// A tiny Bun HTTP app with a hackathon landing page and the existing pumpkin API.
+// A tiny Bun HTTP app with a Caveman Wiki landing page and the existing pumpkin API.
 
 export type Pumpkin = { id: number; name: string; weightKg: number; spooky: boolean }
 
@@ -104,93 +104,58 @@ function landingPage(): Response {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#17131c">
-  <title>Hackathon — Coming soon</title>
+  <meta name="theme-color" content="#302719">
+  <meta name="description" content="Explore the Caveman Wiki: ancient know-how, told plain and simple.">
+  <title>Caveman Wiki — Stone-age know-how</title>
   <style>
     :root {
-      color-scheme: dark;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #17131c;
-      color: #f8f1e7;
+      color-scheme: light;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f4efe4;
+      color: #302719;
       font-synthesis: none;
       text-rendering: optimizeLegibility;
     }
     * { box-sizing: border-box; }
     body { margin: 0; min-width: 320px; min-height: 100vh; }
     a { color: inherit; }
-    a:focus-visible { outline: 3px solid #ffd39d; outline-offset: 5px; }
-    .page {
-      min-height: 100vh;
-      display: grid;
-      grid-template-rows: auto 1fr auto;
-      padding: clamp(1.25rem, 4vw, 3rem) clamp(1.25rem, 7vw, 7rem);
-      overflow: hidden;
-      position: relative;
-      isolation: isolate;
-    }
-    .page::before {
-      content: "";
-      position: absolute;
-      z-index: -1;
-      width: min(70vw, 760px);
-      aspect-ratio: 1;
-      border-radius: 50%;
-      right: -15%;
-      top: 8%;
-      background: radial-gradient(circle, rgba(242, 133, 57, .2), rgba(242, 133, 57, 0) 68%);
-      pointer-events: none;
-    }
-    header, footer { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
-    .wordmark { font-size: .9rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
-    .edition { color: #c8becd; font-size: .85rem; }
-    main { display: flex; align-items: center; padding: 5rem 0; }
-    .hero { max-width: 880px; }
-    .eyebrow { color: #ffb36b; font-size: .8rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
-    h1 { margin: 1rem 0 1.25rem; max-width: 800px; font-size: clamp(3.5rem, 11vw, 8.5rem); line-height: .94; letter-spacing: -.075em; }
-    .description { max-width: 540px; color: #d0c7d1; font-size: clamp(1.05rem, 2vw, 1.25rem); line-height: 1.7; }
-    .cta { display: inline-flex; align-items: center; gap: .75rem; margin-top: 1.5rem; padding: 1rem 1.25rem; border-radius: .6rem; background: #f28b45; color: #21140d; font-size: .95rem; font-weight: 750; text-decoration: none; transition: background-color .18s ease, transform .18s ease; }
-    .cta:hover { background: #ffad6b; transform: translateY(-2px); }
-    .cta span { font-size: 1.15rem; }
-    .status { display: block; margin-top: 1rem; color: #bdb2c2; font-size: .85rem; }
-    footer { color: #bdb2c2; font-size: .8rem; }
-    .motif { position: absolute; right: clamp(1.5rem, 8vw, 8rem); top: 50%; width: clamp(4rem, 8vw, 7rem); aspect-ratio: 1; color: #ffb36b; opacity: .82; transform: translateY(-50%); pointer-events: none; }
-    .motif svg { display: block; width: 100%; height: 100%; }
-    @media (max-width: 700px) { .motif { right: 1.5rem; top: 27%; width: 3.5rem; opacity: .55; } }
+    a:focus-visible { outline: 3px solid #b66536; outline-offset: 5px; }
+    .page { min-height: 100vh; display: grid; grid-template-rows: auto 1fr auto; padding: clamp(1.25rem, 5vw, 4rem) clamp(1.25rem, 8vw, 8rem); }
+    header, footer { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+    .wordmark { font-size: .9rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+    .note, footer { color: #71634d; font-size: .9rem; }
+    main { display: flex; align-items: center; padding: 4rem 0; }
+    .hero { width: min(100%, 760px); }
+    .eyebrow { margin: 0 0 1rem; color: #8a512f; font-size: .78rem; font-weight: 800; letter-spacing: .15em; text-transform: uppercase; }
+    h1 { margin: 0; font-size: clamp(3.5rem, 12vw, 8rem); line-height: .95; letter-spacing: -.075em; }
+    .tagline { margin: 1.25rem 0 0; color: #8a512f; font-size: clamp(1.15rem, 3vw, 1.6rem); font-weight: 700; }
+    .description { max-width: 570px; margin: 1rem 0 0; color: #5e5547; font-size: clamp(1rem, 2vw, 1.15rem); line-height: 1.75; }
+    .cta { display: inline-flex; align-items: center; gap: .75rem; margin-top: 1.75rem; padding: .95rem 1.25rem; border-radius: .55rem; background: #496144; color: #fffdf7; font-weight: 750; text-decoration: none; transition: background-color .18s ease, transform .18s ease; }
+    .cta:hover { background: #354b31; transform: translateY(-2px); }
+    .cta span { font-size: 1.2rem; }
     @media (max-width: 520px) {
       .page { padding: 1.25rem; }
       main { padding: 4rem 0; }
-      header, footer { align-items: flex-start; }
-      .edition { text-align: right; }
-      footer { flex-direction: column; }
-      .motif { top: 23%; right: 1.35rem; }
+      header { align-items: flex-start; }
+      .note { text-align: right; }
+      footer { align-items: flex-start; flex-direction: column; }
     }
-    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; } }
+    @media (prefers-reduced-motion: reduce) { .cta { transition: none; } }
   </style>
 </head>
 <body>
   <div class="page">
-    <header>
-      <span class="wordmark">Hackathon</span>
-      <span class="edition">Ideas start here</span>
-    </header>
-    <div class="motif" aria-hidden="true">
-      <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M50 20c-5-8-3-14 4-17 2 7 1 12-4 17Z" fill="currentColor"/>
-        <path d="M47 25c-17-8-34 3-34 24 0 24 17 39 37 39s37-15 37-39c0-21-17-32-34-24-2 1-4 1-6 0Z" fill="currentColor"/>
-        <path d="M50 27c-8 17-8 42 0 59M33 28c-8 17-8 39 2 53M67 28c8 17 8 39-2 53" stroke="#17131c" stroke-width="3" stroke-linecap="round" opacity=".38"/>
-        <path d="m34 48 10 8-10 7V48Zm32 0-10 8 10 7V48Zm-20 24 4-5 4 5h-8Z" fill="#17131c" opacity=".8"/>
-      </svg>
-    </div>
+    <header><span class="wordmark">Caveman Wiki</span><span class="note">Good knowledge. No fancy talk.</span></header>
     <main>
-      <section class="hero" aria-labelledby="hero-title">
-        <p class="eyebrow">Make something remarkable</p>
-        <h1 id="hero-title">Hackathon</h1>
-        <p class="description">A gathering for curious minds to build, experiment, and bring bold ideas to life. More details are on the way.</p>
-        <a class="cta" href="mailto:hello@example.com?subject=Hackathon%20updates">Get event updates <span aria-hidden="true">↗</span></a>
-        <span class="status" role="status">Event details coming soon</span>
+      <section class="hero" aria-labelledby="page-title">
+        <p class="eyebrow">Old wisdom, made simple</p>
+        <h1 id="page-title">Caveman Wiki</h1>
+        <p class="tagline">Big brain. Simple words. Good info.</p>
+        <p class="description">Learn how things work, from fire and tools to the world around us. Caveman Wiki gathers useful knowledge and explains it plain, so anyone can understand.</p>
+        <a class="cta" href="/wiki">Explore the wiki <span aria-hidden="true">→</span></a>
       </section>
     </main>
-    <footer><span>Big ideas. Hands-on making.</span><span>Stay curious.</span></footer>
+    <footer><span>Curiosity good. Learning better.</span><span>Take knowledge back to your cave.</span></footer>
   </div>
 </body>
 </html>`, {
@@ -211,6 +176,10 @@ export function handle(req: Request): Response {
 
   if (req.method === "GET" && url.pathname === "/about") {
     return aboutPage()
+  }
+
+  if (req.method === "GET" && url.pathname === "/health") {
+    return json({ status: "ok" })
   }
 
   if (req.method === "GET" && url.pathname === "/pumpkins") {

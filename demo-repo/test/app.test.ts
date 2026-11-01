@@ -3,35 +3,25 @@ import { handle, pumpkins } from "../src/app"
 
 const get = (path: string) => handle(new Request(`http://localhost${path}`))
 
-describe("hackathon landing page", () => {
-  test("GET / serves the page successfully with its key content and call to action", async () => {
+describe("Caveman Wiki landing page", () => {
+  test("GET / serves the page successfully with its key content and explore link", async () => {
     const res = get("/")
     expect(res.status).toBe(200)
-    expect(res.headers.get("content-type")).toContain("text/html")
+    expect(res.headers.get("content-type")).toBe("text/html; charset=utf-8")
 
     const body = await res.text()
-    expect(body).toContain("<title>Hackathon — Coming soon</title>")
-    expect(body).toContain('<h1 id="hero-title">Hackathon</h1>')
-    expect(body).toContain("A gathering for curious minds to build, experiment, and bring bold ideas to life.")
-    expect(body).toContain('class="cta"')
-    expect(body).toContain("Get event updates")
+    expect(body).toContain('<title>Caveman Wiki — Stone-age know-how</title>')
+    expect(body).toContain('<meta name="description"')
+    expect(body).toContain('<header>')
+    expect(body).toContain('<main>')
+    expect(body).toContain('<footer>')
+    expect(body).toContain('<h1 id="page-title">Caveman Wiki</h1>')
+    expect(body).toContain('Big brain. Simple words. Good info.')
+    expect(body).toContain('Learn how things work, from fire and tools to the world around us.')
+    expect(body).toContain('<a class="cta" href="/wiki">Explore the wiki')
     expect(body).toContain('@media (max-width: 520px)')
-    expect(body).toContain('background: #17131c')
-    expect(body).toContain('background: #f28b45')
-    expect(body).toContain('color: #f8f1e7')
-    expect(body).toContain('a:focus-visible')
-    expect(body).toContain('class="motif" aria-hidden="true"')
-    expect(body).toContain('prefers-reduced-motion: reduce')
-  })
-
-  test("GET /hackathon serves the placeholder page as HTML", async () => {
-    const res = get("/hackathon")
-    expect(res.status).toBe(200)
-    expect(res.headers.get("content-type")).toContain("text/html")
-
-    const body = await res.text()
-    expect(body).toContain('<h1 id="hero-title">Hackathon</h1>')
-    expect(body).toContain("Get event updates")
+    expect(body).toContain('background: #f4efe4')
+    expect(body).not.toContain('<script')
   })
 })
 
@@ -64,6 +54,13 @@ describe("about page", () => {
 })
 
 describe("pumpkin patch api", () => {
+  test("GET /health returns an OK status and JSON response", async () => {
+    const res = get("/health")
+    expect(res.status).toBe(200)
+    expect(await res.json()).toEqual({ status: "ok" })
+    expect(res.headers.get("content-type")).toBe("application/json")
+  })
+
   test("GET /pumpkins lists pumpkins", async () => {
     const res = get("/pumpkins")
     expect(res.status).toBe(200)

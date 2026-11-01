@@ -113,7 +113,7 @@ async function guard(ticketId: string, me: Agent, fn: () => Promise<void>) {
         }
         const raw = (e as Error).message
         const reason = /token ceiling/.test(raw)
-            ? `Process-wide token ceiling reached (MAX_TOTAL_TOKENS). Run scripts/reset-tokens.sh (or click "Reset tokens"), then Retry.`
+            ? `Paused: process-wide token ceiling reached (MAX_TOTAL_TOKENS). Progress is saved. Click "Reset tokens & resume" to continue where it stopped.`
             : e instanceof Abort ? raw : `${me.name} (${me.role}) crashed: ${raw}`
         console.error(`[${me.id}] ${ticketId}:`, e)
         await ticketRef(ticketId).fail(reason)
